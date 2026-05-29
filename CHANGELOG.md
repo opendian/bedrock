@@ -4,6 +4,10 @@ All notable changes to Bedrock Voice are tracked here. Versioning follows [SemVe
 
 ## [Unreleased]
 
+## [0.1.2] — 2026-05-29
+
+User-facing voice and language controls. Pronunciation now follows the chosen voice instead of being silently locked to American English or French.
+
 ### Added
 - **Voice selection dropdown** with 27 curated Kokoro voices grouped by language (American English, British English, French, Italian, Spanish, Japanese, Mandarin Chinese) and gender. The existing text input is now an "Or custom voice ID" override for power users and future voices not yet curated. Custom IDs already set in `data.json` are preserved and shown in the dropdown labeled `<id> (custom)`.
 - **Kokoro language auto-derivation** — the Kokoro `lang_code` is now inferred from the voice ID prefix (e.g. `ff_siwis` → `f`, `jf_alpha` → `j`, `zm_yunxi` → `z`). Previously it was hardcoded from the LLM language setting and only supported `a`/`f`. The LLM language setting still controls how the script is rewritten.
