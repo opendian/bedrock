@@ -11,7 +11,11 @@
 [![No API Key](https://img.shields.io/badge/API%20key-none-green.svg)](#why-this-stays-on-your-machine)
 
 <p align="center">
-  <img src="docs/screenshots/hero-hud.png" alt="The floating caption HUD karaoke-highlighting a note in Obsidian" width="720" />
+  <a href="docs/screenshots/hero.mp4">
+    <img src="docs/screenshots/hero.gif" alt="Bedrock Voice reading an Obsidian note aloud with karaoke captions highlighting each word as it's spoken" width="720" />
+  </a>
+  <br/>
+  <sub><i>Click the GIF for the high-res MP4. The plugin runs at the speed and quality shown.</i></sub>
 </p>
 
 ---
