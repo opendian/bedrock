@@ -5,16 +5,16 @@
 <h1 align="center">Bedrock Voice</h1>
 
 <p align="center">
-  <i>An accessibility-first reading companion for your second brain.</i><br/>
-  <sub>Karaoke captions. Local TTS. No metered API. Built for ADHD, dyslexia, and information overload.</sub>
+  <i>Read your Obsidian notes aloud. Locally. Free. Instant replay.</i><br/>
+  <sub>Word-level karaoke captions over a local Kokoro voice. Fully offline by default. No API key, no meter, no notes leaving your machine.</sub>
 </p>
 
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg" /></a>
-  <a href="docs/ACCESSIBILITY.md"><img alt="Accessibility" src="https://img.shields.io/badge/accessibility-first-success.svg" /></a>
   <a href="https://huggingface.co/hexgrad/Kokoro-82M"><img alt="Built with Kokoro" src="https://img.shields.io/badge/TTS-Kokoro%2082M-purple.svg" /></a>
-  <img alt="Apple Silicon" src="https://img.shields.io/badge/Apple%20Silicon-native-black.svg" />
+  <img alt="macOS Apple Silicon" src="https://img.shields.io/badge/macOS-Apple%20Silicon-black.svg" />
   <a href="#why-this-stays-on-your-machine"><img alt="No API Key" src="https://img.shields.io/badge/API%20key-none-green.svg" /></a>
+  <a href="docs/ACCESSIBILITY.md"><img alt="Accessibility commitments" src="https://img.shields.io/badge/accessibility-commitments-success.svg" /></a>
   <a href="https://github.com/opendian"><img alt="Opendian" src="https://img.shields.io/badge/by-opendian-181717.svg" /></a>
 </p>
 
@@ -22,7 +22,7 @@
   <a href="https://opendian.github.io/bedrock/"><strong>opendian.github.io/bedrock</strong></a> — the landing page
 </p>
 
-<p align="center">Bedrock Voice reads your Obsidian notes aloud — with karaoke captions that highlight each word as it's spoken. Runs locally on your Mac. No notes leave your machine.</p>
+<p align="center">Bedrock Voice turns any Obsidian note into spoken audio with word-level karaoke captions. The notes you wrote to think become the notes you listen to remember — on a walk, on a commute, away from the screen.</p>
 
 <p align="center">
   <a href="docs/screenshots/hero.mp4">
@@ -36,11 +36,9 @@
 
 ## Why this exists
 
-If you have ADHD, dyslexia, an auditory processing difference, or you just live in 2026 with too many notes — reading the things you wrote down can be the hardest part of having written them.
+You re-read your own notes more than you read them the first time. Walking, commuting, cooking, lying down — that's reading time you're leaving on the floor because notes don't come with you off the screen. Bedrock Voice turns any note into spoken audio you can take with you, and karaoke captions that follow each word when you do come back to read along.
 
-Bedrock Voice is built around one observation: **bi-modal reading** (seeing a word + hearing it at the same moment) is one of the most-studied, lowest-tech accessibility interventions there is. It's the foundation of [Bookshare](https://www.bookshare.org/), [Kurzweil 3000](https://www.kurzweiledu.com/products/kurzweil-3000.html), [Speechify](https://speechify.com), and a generation of school-library reading tools — but those are SaaS, locked-in, expensive, and not built for the way you actually take notes.
-
-This is the same idea, opinionated for Obsidian, **local-first**, free as in MIT.
+It's also the canonical reading accommodation for **ADHD**, **dyslexia**, and **auditory processing**. [Bookshare](https://www.bookshare.org/), [Kurzweil 3000](https://www.kurzweiledu.com/products/kurzweil-3000.html), [Speechify](https://speechify.com), and a generation of school-library reading tools are built on the same bi-modal pattern (seeing + hearing simultaneously). Those are SaaS and locked-in. This is opinionated for Obsidian, **local-first**, MIT.
 
 ---
 
@@ -55,19 +53,20 @@ This is the same idea, opinionated for Obsidian, **local-first**, free as in MIT
   <img src="docs/screenshots/caption-detail.png" alt="Word-level highlight on the active sentence with the next sentence previewed below" width="640" />
 </p>
 
-## Who it's for
+## Who reaches for this
 
 | If you… | …this is for you |
 | --- | --- |
-| Have **ADHD** and lose the thread re-reading your own notes | Hearing + seeing simultaneously cuts attention drift. Audio anchors the eyes. |
+| **Re-read your notes** more than you re-write them | Audio off the screen. Walks, commutes, dishes, eyes-closed thinking. |
+| Want to **listen to your second brain like a podcast** | The default narration mode digests a note into a 60–90s spoken script. Whole-note mode is a toggle. |
+| Have **ADHD** and lose the thread re-reading | Hearing + seeing simultaneously cuts attention drift. Audio anchors the eyes. |
 | Are **dyslexic** | The karaoke pattern is the canonical dyslexia accommodation. This puts it on your second brain. |
 | Have an **auditory processing** difference | Self-paced playback (0.75× – 1.75×), Space to pause anytime, no autoplay surprise. |
 | Are **autistic** and need predictable pacing | No notifications, no ambient sounds, no animation beyond the highlight. |
 | Have **screen fatigue** or eye strain | Look away. Keep listening. The note keeps reading. |
-| Are **overwhelmed by your own vault** | Audio while walking, cooking, commuting. The notes you wrote to think become the notes you listen to remember. |
-| Are **multilingual** (the project author is FR + EN) | English narration is rewritten for spoken cadence. French stays French. |
+| Are **multilingual** | English narration is rewritten for spoken cadence. French stays French. |
 
-Bedrock Voice doesn't pretend to be a clinical tool. It's a thoughtful default — the small accessibility win that should have been built into every note app from day one.
+Bedrock Voice doesn't pretend to be a clinical tool. It's a thoughtful default — the small productivity + accessibility win that should have been built into every note app from day one.
 
 ---
 
