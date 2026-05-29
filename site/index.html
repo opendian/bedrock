@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Bedrock Voice — read your notes aloud with karaoke captions</title>
+  <meta name="description" content="An accessibility-first reading companion for your Obsidian vault. Karaoke captions, local TTS, no metered API. Built for ADHD, dyslexia, and information overload." />
+
+  <meta property="og:title" content="Bedrock Voice — read your notes aloud" />
+  <meta property="og:description" content="Karaoke captions. Local TTS. No metered API. Built for ADHD, dyslexia, and information overload." />
+  <meta property="og:image" content="https://opendian.github.io/bedrock/assets/hero.gif" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://opendian.github.io/bedrock/" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="alternate icon" href="assets/logo.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <nav class="top-nav" aria-label="Primary">
+    <a class="brand" href="#top">
+      <img src="assets/logo.png" alt="" width="36" height="36" />
+      <span>Bedrock</span>
+    </a>
+    <div class="nav-links">
+      <a href="#what">What it does</a>
+      <a href="#who">Who it's for</a>
+      <a href="#how">How</a>
+      <a href="#install">Install</a>
+      <a class="nav-cta" href="https://github.com/opendian/bedrock" aria-label="Bedrock on GitHub">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+        GitHub
+      </a>
+    </div>
+  </nav>
+
+  <main id="main">
+
+    <section class="hero" id="top">
+      <div class="hero-grain" aria-hidden="true"></div>
+      <div class="hero-inner">
+        <img class="hero-logo" src="assets/logo.png" alt="Bedrock logo — granite cube with a voice waveform carved into its seam" width="160" height="160" loading="eager" />
+        <h1>Hear what you wrote.<br/>One word at a time.</h1>
+        <p class="hero-sub">An accessibility-first reading companion for your second brain. Karaoke captions, local TTS, no metered API. Built for <strong>ADHD</strong>, <strong>dyslexia</strong>, and information overload.</p>
+
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="#install">Install for Obsidian</a>
+          <a class="btn btn-ghost" href="https://github.com/opendian/bedrock" rel="noopener">View on GitHub →</a>
+        </div>
+
+        <div class="hero-meta">
+          <span><span class="dot dot-mit"></span>MIT licensed</span>
+          <span><span class="dot dot-local"></span>Local TTS</span>
+          <span><span class="dot dot-no-api"></span>No API key</span>
+          <span><span class="dot dot-mac"></span>Apple Silicon native</span>
+        </div>
+      </div>
+
+      <figure class="hero-demo reveal">
+        <video
+          poster="assets/logo.png"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          aria-label="Demo: Bedrock Voice reading an Obsidian note aloud with each word highlighting as it's spoken."
+        >
+          <source src="assets/hero.mp4" type="video/mp4" />
+          <img src="assets/hero.gif" alt="Demo: Bedrock Voice reading an Obsidian note aloud, each word highlighting as it's spoken." width="720" />
+        </video>
+        <figcaption>Click to read. Each word lights up as it's spoken. Cached for instant replay.</figcaption>
+      </figure>
+    </section>
+
+    <section class="band band-bi-modal" id="why">
+      <div class="band-inner">
+        <p class="eyebrow">Why this exists</p>
+        <h2><span class="hl-serif">Bi-modal reading</span> is one of the most-studied accessibility wins there is.</h2>
+        <p class="lead">Hearing a word the moment you see it. The foundation of <a href="https://www.bookshare.org/" rel="noopener">Bookshare</a>, <a href="https://www.kurzweiledu.com/products/kurzweil-3000.html" rel="noopener">Kurzweil 3000</a>, and a generation of school-library reading tools — but those are SaaS, locked-in, expensive, and not built for the way you actually take notes.</p>
+        <p class="lead">Bedrock Voice is the same idea, opinionated for Obsidian, <strong>local-first</strong>, free as in MIT.</p>
+      </div>
+    </section>
+
+    <section id="what" class="features">
+      <div class="band-inner">
+        <p class="eyebrow">What it does</p>
+        <h2>Four moves. One outcome.</h2>
+
+        <div class="feature-grid">
+          <article class="feature reveal">
+            <span class="feat-num">01</span>
+            <h3>Reads any note aloud</h3>
+            <p>Clean local voice via <a href="https://huggingface.co/hexgrad/Kokoro-82M" rel="noopener">Kokoro 82M</a> (Apache-2). Apple-Silicon native, CPU is enough.</p>
+          </article>
+          <article class="feature reveal">
+            <span class="feat-num">02</span>
+            <h3>Karaoke captions</h3>
+            <p>A floating HUD highlights the current word and current sentence as they're spoken. The next sentence previews underneath.</p>
+          </article>
+          <article class="feature reveal">
+            <span class="feat-num">03</span>
+            <h3>Tightened for cadence</h3>
+            <p>A small LLM pass first compresses the note into a spoken script — using auth you already have. Your note as cadence, not text-dump.</p>
+          </article>
+          <article class="feature reveal">
+            <span class="feat-num">04</span>
+            <h3>Smart cache</h3>
+            <p>Click twice on an unchanged note → instant replay. Edit the note → next click regenerates. No compute waste.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="who" class="who">
+      <div class="band-inner">
+        <p class="eyebrow">Who it's for</p>
+        <h2>Built for brains that don't read in a straight line.</h2>
+
+        <ul class="persona-grid">
+          <li>
+            <h3>ADHD</h3>
+            <p>Hearing + seeing simultaneously cuts attention drift. Audio anchors the eyes.</p>
+          </li>
+          <li>
+            <h3>Dyslexia</h3>
+            <p>The karaoke pattern is the canonical dyslexia accommodation. This puts it on your second brain.</p>
+          </li>
+          <li>
+            <h3>Auditory processing</h3>
+            <p>Self-paced playback (0.75× – 1.75×). Space to pause anytime. No autoplay surprise.</p>
+          </li>
+          <li>
+            <h3>Autism</h3>
+            <p>No notifications, no ambient sounds, no animation beyond the highlight. Predictable pacing.</p>
+          </li>
+          <li>
+            <h3>Screen fatigue</h3>
+            <p>Look away. Keep listening. The note keeps reading.</p>
+          </li>
+          <li>
+            <h3>Vault overwhelm</h3>
+            <p>Audio while walking, cooking, commuting. The notes you wrote to think become the notes you listen to remember.</p>
+          </li>
+          <li>
+            <h3>Multilingual</h3>
+            <p>English narration is rewritten for spoken cadence. French stays French.</p>
+          </li>
+          <li class="persona-cta">
+            <h3>Not yet?</h3>
+            <p>Open an <a href="https://github.com/opendian/bedrock/issues/new?template=accessibility.yml" rel="noopener">accessibility issue</a>. Lived-experience feedback shapes the roadmap.</p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="how" class="how">
+      <div class="band-inner">
+        <p class="eyebrow">How it works</p>
+        <h2>A thin plugin. A small pipeline. A cached audio file.</h2>
+
+        <pre class="diagram" aria-label="Architecture: Obsidian note flows through a TypeScript plugin to a Python pipeline that returns a wav file and timing JSON, rendered into a karaoke HUD."><code>Obsidian note ──▶ Plugin (TS) ──▶ Python pipeline ──▶ Karaoke HUD
+                                  │
+                                  ├─ Extract source (tldr + H2, or whole body)
+                                  ├─ Tighten for speech (Claude/Codex CLI, or local MLX)
+                                  ├─ Synthesize sentence-by-sentence (Kokoro)
+                                  └─ Return wav + per-sentence timing JSON</code></pre>
+
+        <p class="lead">The plugin is a thin shell. All heavy work happens in Python and gets cached on disk. No recompute when nothing changed. Full architecture notes: <a href="https://github.com/opendian/bedrock/blob/main/docs/architecture.md" rel="noopener">docs/architecture.md</a>.</p>
+      </div>
+    </section>
+
+    <section id="local" class="local">
+      <div class="band-inner">
+        <p class="eyebrow">Why it stays on your machine</p>
+        <h2>No notes leave. No API key required. No meter ticks.</h2>
+
+        <table class="cost-table">
+          <thead>
+            <tr>
+              <th>Component</th>
+              <th>Where it runs</th>
+              <th>What it costs</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>TTS (Kokoro 82M)</td>
+              <td>Locally, on your CPU</td>
+              <td class="zero">$0</td>
+            </tr>
+            <tr>
+              <td>Script tightening (<code>claude</code>)</td>
+              <td>Claude Code CLI auth</td>
+              <td class="zero">$0 marginal</td>
+            </tr>
+            <tr>
+              <td>Script tightening (<code>codex</code>)</td>
+              <td>OpenAI Codex CLI auth</td>
+              <td class="zero">$0 marginal</td>
+            </tr>
+            <tr>
+              <td>Script tightening (<code>local</code>)</td>
+              <td>MLX-LM in-process</td>
+              <td class="zero">$0 (offline)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p class="lead">No <code>ANTHROPIC_API_KEY</code>. No <code>OPENAI_API_KEY</code>. No <code>ELEVENLABS_API_KEY</code>. Nothing ticks.</p>
+      </div>
+    </section>
+
+    <section id="install" class="install">
+      <div class="band-inner">
+        <p class="eyebrow">Install</p>
+        <h2>Three steps, ten minutes.</h2>
+
+        <ol class="install-steps">
+          <li>
+            <h3>1. Install the plugin via BRAT</h3>
+            <p>Install <a href="https://github.com/TfTHacker/obsidian42-brat" rel="noopener">BRAT</a> from Obsidian community plugins, then BRAT settings → "Add Beta Plugin" → paste:</p>
+            <pre><code>opendian/bedrock</code></pre>
+            <p>Enable <strong>Bedrock Voice</strong> under Community plugins.</p>
+          </li>
+          <li>
+            <h3>2. Install the voice pipeline</h3>
+            <p>A small Python pipeline ships inside the plugin folder under <code>voice/</code>. One-time setup:</p>
+            <pre><code>brew install python@3.12 espeak-ng ffmpeg
+cd "&lt;your-vault&gt;/.obsidian/plugins/bedrock-voice/voice"
+bash install.sh</code></pre>
+            <p>First run downloads Kokoro 82M (~300 MB), once.</p>
+          </li>
+          <li>
+            <h3>3. Read a note aloud</h3>
+            <p>Open any note. Ribbon icon (<code>audio-lines</code>) or command palette → <strong>Read note aloud with captions</strong>. Space toggles play/pause. Escape closes the HUD.</p>
+          </li>
+        </ol>
+
+        <div class="install-cta">
+          <a class="btn btn-primary" href="https://github.com/opendian/bedrock" rel="noopener">Open the repo</a>
+          <a class="btn btn-ghost" href="https://github.com/opendian/bedrock/blob/main/docs/ACCESSIBILITY.md" rel="noopener">Read the accessibility contract →</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-final">
+      <div class="band-inner">
+        <h2>Hear what you wrote.</h2>
+        <p>The notes you wrote to think become the notes you listen to remember.</p>
+        <div class="install-cta">
+          <a class="btn btn-primary" href="https://github.com/opendian/bedrock" rel="noopener">Star on GitHub</a>
+          <a class="btn btn-ghost" href="https://github.com/opendian/bedrock/issues/new?template=accessibility.yml" rel="noopener">Suggest an accommodation</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="band-inner">
+      <div class="foot-grid">
+        <div>
+          <img src="assets/logo.png" alt="" width="40" height="40" />
+          <p class="foot-brand">Bedrock</p>
+          <p class="foot-tag">by <a href="https://github.com/opendian" rel="noopener">opendian</a></p>
+        </div>
+        <div>
+          <p class="foot-label">Product</p>
+          <ul>
+            <li><a href="#what">What it does</a></li>
+            <li><a href="#who">Who it's for</a></li>
+            <li><a href="#how">Architecture</a></li>
+            <li><a href="#install">Install</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="foot-label">Code</p>
+          <ul>
+            <li><a href="https://github.com/opendian/bedrock" rel="noopener">GitHub</a></li>
+            <li><a href="https://github.com/opendian/bedrock/releases" rel="noopener">Releases</a></li>
+            <li><a href="https://github.com/opendian/bedrock/issues" rel="noopener">Issues</a></li>
+            <li><a href="https://github.com/opendian/bedrock/blob/main/CONTRIBUTING.md" rel="noopener">Contribute</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="foot-label">Read</p>
+          <ul>
+            <li><a href="https://github.com/opendian/bedrock/blob/main/docs/ACCESSIBILITY.md" rel="noopener">Accessibility</a></li>
+            <li><a href="https://github.com/opendian/bedrock/blob/main/docs/architecture.md" rel="noopener">Architecture</a></li>
+            <li><a href="https://github.com/opendian/bedrock/blob/main/CHANGELOG.md" rel="noopener">Changelog</a></li>
+            <li><a href="https://github.com/opendian/bedrock/blob/main/LICENSE" rel="noopener">MIT License</a></li>
+          </ul>
+        </div>
+      </div>
+      <p class="foot-bottom">© 2026 <a href="https://meziani.org" rel="noopener">Yani Meziani</a> · MIT · Built for brains that don't read in a straight line.</p>
+    </div>
+  </footer>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
