@@ -1,6 +1,6 @@
 {
   "name": "bedrock-voice",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Read Obsidian notes aloud with karaoke captions. Local Kokoro TTS, fully offline by default, no API key. macOS Apple Silicon.",
   "main": "main.js",
   "scripts": {
