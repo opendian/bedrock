@@ -1,7 +1,7 @@
 {
   "name": "bedrock-voice",
-  "version": "0.1.0",
-  "description": "Accessibility-first read-aloud Obsidian plugin with local Kokoro TTS and real-time karaoke captions.",
+  "version": "0.1.1",
+  "description": "Read Obsidian notes aloud with karaoke captions. Local Kokoro TTS, fully offline by default, no API key. macOS Apple Silicon.",
   "main": "main.js",
   "scripts": {
     "dev": "node esbuild.config.mjs",

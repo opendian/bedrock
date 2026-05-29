@@ -1,7 +1,7 @@
 {
   "id": "bedrock-voice",
   "name": "Bedrock Voice",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "minAppVersion": "1.4.0",
   "description": "Read notes aloud with karaoke captions. Local TTS, fully offline by default, no API key. macOS Apple Silicon only at v0.1.",
   "author": "Yani Meziani",
