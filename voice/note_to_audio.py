@@ -22,22 +22,103 @@ from vault import split_frontmatter, slugify
 from llm import tighten_for_speech
 
 
+# Frontmatter keys that act as a one-line gist. First match wins.
+_TLDR_KEYS = ("tldr", "gist", "summary", "description")
+
+# Cap per-section body so a long note doesn't blow the LLM context budget.
+_SECTION_WORD_CAP = 80
+
+
+def _clean_markdown(line):
+    """Strip markdown noise from a single line so the LLM gets readable prose."""
+    s = re.sub(r"^#+\s+", "", line)                              # ### subheading
+    s = re.sub(r"\[\[([^\]|]+)(\|[^\]]+)?\]\]", r"\1", s)        # [[wiki|alias]] -> wiki
+    s = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", s)               # [text](url) -> text
+    s = re.sub(r"`([^`]+)`", r"\1", s)                            # `inline code`
+    s = re.sub(r"\*\*([^*]+)\*\*", r"\1", s)                     # **bold**
+    s = re.sub(r"(?<!\*)\*([^*]+)\*(?!\*)", r"\1", s)            # *italic*
+    s = re.sub(r"^[-*+]\s+", "", s)                               # - list item
+    s = re.sub(r"^\d+\.\s+", "", s)                               # 1. list item
+    s = re.sub(r"^>+\s*", "", s)                                  # > blockquote
+    s = re.sub(r"<[^>]+>", "", s)                                 # <html>, <https://url>
+    return s.strip()
+
+
 def extract_source(text, whole=False):
-    """Return the text to narrate: tldr + H2 headers by default, or the whole body."""
+    """Return the text to narrate.
+
+    Default mode (whole=False) — collect the load-bearing prose:
+      1. Frontmatter `tldr:` (or `gist:`/`summary:`/`description:`).
+      2. For each `## H2` section: the heading + the first ~80 words of body.
+         Skips code blocks, tables, separators.
+      3. Fallback to the whole body if nothing was extracted.
+
+    whole=True bypasses extraction and returns the body verbatim.
+    """
     fm, body = split_frontmatter(text)
     if whole:
         return body.strip()
+
     parts = []
+
+    # 1. Frontmatter one-line gist (first matching key wins).
     if fm:
-        m = re.search(r"^tldr:\s*(.+)$", fm, re.MULTILINE)
-        if m:
-            parts.append(m.group(1).strip())
-    # first thesis line under H1 + each H2 line
-    for line in body.splitlines():
-        s = line.strip()
-        if s.startswith("## "):
-            parts.append(s[3:].strip())
-    return "\n".join(parts).strip() or body.strip()
+        for key in _TLDR_KEYS:
+            m = re.search(rf"^{key}:\s*(.+)$", fm, re.MULTILINE | re.IGNORECASE)
+            if m:
+                value = m.group(1).strip().strip('"\'').strip()
+                if value:
+                    parts.append(value)
+                break
+
+    # 2. Walk each H2 section, capturing heading + first paragraph of body.
+    lines = body.splitlines()
+    n = len(lines)
+    i = 0
+    in_code = False
+    while i < n:
+        s = lines[i].strip()
+
+        if s.startswith("```"):
+            in_code = not in_code
+            i += 1
+            continue
+
+        if not in_code and s.startswith("## "):
+            heading = s[3:].strip()
+            body_words = []
+            j = i + 1
+            sec_in_code = False
+            while j < n:
+                t = lines[j].strip()
+                if t.startswith("```"):
+                    sec_in_code = not sec_in_code
+                    j += 1
+                    continue
+                if sec_in_code:
+                    j += 1
+                    continue
+                if t.startswith("## ") or t.startswith("# "):
+                    break
+                if t.startswith("|") or t in ("---", "***", "___"):
+                    j += 1
+                    continue
+                cleaned = _clean_markdown(t)
+                if cleaned:
+                    body_words.extend(cleaned.split())
+                if len(body_words) >= _SECTION_WORD_CAP:
+                    break
+                j += 1
+
+            section_body = " ".join(body_words[:_SECTION_WORD_CAP])
+            parts.append(f"{heading}. {section_body}".strip(". ").strip() or heading)
+            i = j
+            continue
+
+        i += 1
+
+    collected = "\n\n".join(p for p in parts if p).strip()
+    return collected or body.strip()
 
 
 def synth(script, out_path):

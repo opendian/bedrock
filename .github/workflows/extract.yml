@@ -1,0 +1,147 @@
+name: extract_source unit smoke
+
+# Catches regressions in voice/note_to_audio.py:extract_source — the most
+# launch-critical Python function in the pipeline. A drift here means audio
+# silently summarises the wrong content (see docs/audit-2026-05.md).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "voice/note_to_audio.py"
+      - "voice/vault.py"
+      - ".github/workflows/extract.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "voice/note_to_audio.py"
+      - "voice/vault.py"
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: voice
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Sanity-check extract_source against pinned fixtures
+        run: |
+          python <<'PY'
+          import sys, re
+          sys.path.insert(0, ".")
+          # extract_source has no runtime deps (no kokoro/numpy import path).
+          # Import the module text, lift the function, and exercise it.
+          from textwrap import dedent
+
+          # Inline the function to avoid importing kokoro/numpy at smoke time.
+          src = open("note_to_audio.py").read()
+          ns = {"__name__": "__main__"}
+          # Provide stub `config` so the module imports cleanly.
+          import types
+          stub = types.SimpleNamespace(
+              VAULT_ROOT=".", VOICE_MD=".", CLAUDE_MD=".", INBOX=".",
+              NOTES=".", QUOTIDIEN=".", AUDIO_OUT=".",
+              WHISPER_MODEL="", KOKORO_LANG="a", KOKORO_VOICE="x", KOKORO_SR=24000,
+              LLM_BACKEND="local", CLAUDE_MODEL="", CODEX_MODEL="",
+              LLM_MODEL="", LLM_MAX_TOKENS=1000, SAMPLE_RATE=16000, HOTKEY="",
+          )
+          sys.modules["config"] = stub
+          # llm.tighten_for_speech is only used by main(); not needed here.
+          sys.modules["llm"] = types.SimpleNamespace(tighten_for_speech=lambda x, **k: x)
+          sys.modules["vault"] = types.SimpleNamespace(
+              split_frontmatter=lambda t: (None, t),
+              slugify=lambda s, **k: re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-") or "x",
+          )
+          # Now we can import the real extract_source.
+          import importlib.util
+          spec = importlib.util.spec_from_file_location("nta", "note_to_audio.py")
+          nta = importlib.util.module_from_spec(spec)
+          # Re-stub split_frontmatter using the real one from the file itself —
+          # easier than monkey-patching.
+          def split_fm(t):
+              if t.startswith("---"):
+                  end = t.find("\n---", 3)
+                  if end != -1:
+                      nl = t.find("\n", end + 1)
+                      return t[: nl + 1], t[nl + 1 :]
+              return None, t
+          sys.modules["vault"].split_frontmatter = split_fm
+          spec.loader.exec_module(nta)
+          extract = nta.extract_source
+
+          FIXTURES = [
+              # (description, note_text, must_contain_substring, must_NOT_contain)
+              (
+                  "tldr in frontmatter is captured",
+                  "---\ntldr: A is not B. It is C.\n---\n\n# Title\n\n## Gist\nThe gist body.\n",
+                  "A is not B",
+                  None,
+              ),
+              (
+                  "gist: frontmatter key is captured when tldr is missing",
+                  "---\ngist: Compounds beat plans.\n---\n\n# T\n\n## Key\nReal content here.\n",
+                  "Compounds beat plans",
+                  None,
+              ),
+              (
+                  "H2 body is captured (not just the label)",
+                  "## Setup\nRun bash install.sh inside the voice folder.\n\n## Next\nOpen Obsidian.\n",
+                  "Run bash install.sh",
+                  None,
+              ),
+              (
+                  "Wikilinks are stripped to plain text",
+                  "## Sec\nSee [[Atomic Habits]] for context.\n",
+                  "Atomic Habits",
+                  "[[",
+              ),
+              (
+                  "Inline code backticks are stripped",
+                  "## Sec\nThe `claude` CLI is optional.\n",
+                  "claude CLI is optional",
+                  "`",
+              ),
+              (
+                  "H3 markers are stripped",
+                  "## Top\n### Sub\nReal step here.\n",
+                  "Real step here",
+                  "###",
+              ),
+              (
+                  "Falls back to whole body when neither tldr nor H2 exists",
+                  "Just a paragraph, no headings.\nAnother line.\n",
+                  "Just a paragraph",
+                  None,
+              ),
+              (
+                  "whole=True returns the full body",
+                  "## H2 only label\nWith body underneath.\n",
+                  "With body underneath",
+                  None,
+              ),
+          ]
+
+          failed = 0
+          for desc, text, must, must_not in FIXTURES:
+              whole = "whole=True" in desc
+              got = extract(text, whole=whole)
+              if must not in got:
+                  print(f"FAIL: {desc!r} — missing {must!r}\nGOT:\n{got}\n")
+                  failed += 1
+                  continue
+              if must_not and must_not in got:
+                  print(f"FAIL: {desc!r} — should not contain {must_not!r}\nGOT:\n{got}\n")
+                  failed += 1
+                  continue
+              print(f"  ok: {desc}")
+
+          if failed:
+              print(f"\n{failed} fixture(s) failed.")
+              sys.exit(1)
+          print(f"\nAll {len(FIXTURES)} fixtures passed.")
+          PY
