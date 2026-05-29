@@ -27,7 +27,7 @@ interface CaptionPayload {
 interface BedrockVoiceSettings {
   backend: string; // claude | codex | local
   lang: string; // en | fr
-  voice: string;
+  voice: string; // a Kokoro voice ID (see KOKORO_VOICES) or any custom string
   rate: number;
   whole: boolean;
   voicePath: string; // relative to vault root, or absolute. Empty = use bundled <plugin>/voice/.
@@ -44,6 +44,58 @@ const DEFAULTS: BedrockVoiceSettings = {
   whole: false,
   voicePath: "",
 };
+
+/** Known Kokoro 82M voices, grouped by accent + gender. The label is what the
+ *  user sees in the settings dropdown; the key is the actual voice ID passed
+ *  to Kokoro. The list is curated, not exhaustive — custom IDs are still
+ *  accepted via the "Custom voice ID" override below.
+ *  Source: https://huggingface.co/hexgrad/Kokoro-82M voice list as of 2026-05. */
+const KOKORO_VOICES: Record<string, string> = {
+  // American English · Female
+  af_heart: "American English · Female · Heart (default)",
+  af_bella: "American English · Female · Bella",
+  af_nicole: "American English · Female · Nicole",
+  af_sarah: "American English · Female · Sarah",
+  af_sky: "American English · Female · Sky",
+  af_nova: "American English · Female · Nova",
+  af_river: "American English · Female · River",
+  // American English · Male
+  am_michael: "American English · Male · Michael",
+  am_adam: "American English · Male · Adam",
+  am_echo: "American English · Male · Echo",
+  am_liam: "American English · Male · Liam",
+  am_onyx: "American English · Male · Onyx",
+  // British English · Female
+  bf_emma: "British English · Female · Emma",
+  bf_isabella: "British English · Female · Isabella",
+  bf_alice: "British English · Female · Alice",
+  // British English · Male
+  bm_george: "British English · Male · George",
+  bm_lewis: "British English · Male · Lewis",
+  bm_daniel: "British English · Male · Daniel",
+  // French · Female
+  ff_siwis: "Français · Femme · Siwis",
+  // Italian
+  if_sara: "Italiano · Femmina · Sara",
+  im_nicola: "Italiano · Maschio · Nicola",
+  // Spanish
+  ef_dora: "Español · Mujer · Dora",
+  em_alex: "Español · Hombre · Alex",
+  // Japanese
+  jf_alpha: "日本語 · 女性 · Alpha",
+  jm_kumo: "日本語 · 男性 · Kumo",
+  // Mandarin Chinese
+  zf_xiaoxiao: "中文 · 女 · Xiaoxiao",
+  zm_yunxi: "中文 · 男 · Yunxi",
+};
+
+/** Map a voice ID to the Kokoro lang_code (single letter Kokoro expects).
+ *  This is independent of the LLM rewriting language — Kokoro's lang code
+ *  determines pronunciation; the LLM's `lang` determines the script text. */
+function voiceToKokoroLang(voiceId: string): string | null {
+  const prefix = voiceId.slice(0, 1);
+  return ["a", "b", "e", "f", "h", "i", "j", "p", "z"].includes(prefix) ? prefix : null;
+}
 
 export default class BedrockVoice extends Plugin {
   settings: BedrockVoiceSettings;
@@ -157,12 +209,18 @@ export default class BedrockVoice extends Plugin {
   }
 
   private run(py: string, args: string[], cwd: string): Promise<CaptionPayload> {
+    // Derive the Kokoro lang_code from the voice ID prefix (e.g. ff_siwis -> "f",
+    // jf_alpha -> "j"). Falls back to the LLM language for English/French if the
+    // voice ID doesn't match a known Kokoro lang.
+    const kokoroLang =
+      voiceToKokoroLang(this.settings.voice) ??
+      (this.settings.lang === "fr" ? "f" : "a");
     const env = {
       ...process.env,
       BEDROCK_VAULT_ROOT: this.vaultBase(),
       BEDROCK_LLM_BACKEND: this.settings.backend,
       BEDROCK_KOKORO_VOICE: this.settings.voice,
-      BEDROCK_KOKORO_LANG: this.settings.lang === "fr" ? "f" : "a",
+      BEDROCK_KOKORO_LANG: kokoroLang,
     };
     return new Promise((resolve, reject) => {
       execFile(py, args, { cwd, env, maxBuffer: 32 * 1024 * 1024 }, (err, stdout, stderr) => {
@@ -417,7 +475,9 @@ class BedrockVoiceSettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("Narration language")
-      .setDesc("EN rewrites the note for spoken cadence; FR keeps it French.")
+      .setDesc(
+        "Controls how the LLM tightens the script. English rewrites the note for spoken cadence; Français keeps it French. The Kokoro voice below determines pronunciation.",
+      )
       .addDropdown((d) =>
         d
           .addOptions({ en: "English", fr: "Français" })
@@ -428,15 +488,50 @@ class BedrockVoiceSettingTab extends PluginSettingTab {
           }),
       );
 
-    new Setting(containerEl)
+    // Voice selection — known voices in a dropdown, plus an "or custom" text
+    // input below for voice IDs Kokoro adds later or ones we haven't curated.
+    const isKnownVoice = (id: string) => Object.prototype.hasOwnProperty.call(KOKORO_VOICES, id);
+    const KNOWN_VOICE_OPTIONS: Record<string, string> = { ...KOKORO_VOICES };
+    if (!isKnownVoice(this.plugin.settings.voice)) {
+      // Show the user's current voice in the dropdown even if it's a custom ID.
+      KNOWN_VOICE_OPTIONS[this.plugin.settings.voice] =
+        `${this.plugin.settings.voice} (custom)`;
+    }
+
+    let customInputEl: HTMLInputElement | null = null;
+    const voiceSetting = new Setting(containerEl)
       .setName("Kokoro voice")
-      .setDesc("e.g. af_heart, am_michael, bf_emma. FR voices use ff_/fm_ prefixes.")
-      .addText((t) =>
-        t.setValue(this.plugin.settings.voice).onChange(async (v) => {
-          this.plugin.settings.voice = v.trim() || "af_heart";
-          await this.plugin.saveSettings();
-        }),
+      .setDesc(
+        "Choose a built-in voice or type a custom ID. The voice determines pronunciation; the language above controls rewriting.",
+      )
+      .addDropdown((d) =>
+        d
+          .addOptions(KNOWN_VOICE_OPTIONS)
+          .setValue(this.plugin.settings.voice)
+          .onChange(async (v) => {
+            this.plugin.settings.voice = v;
+            if (customInputEl) customInputEl.value = isKnownVoice(v) ? "" : v;
+            await this.plugin.saveSettings();
+          }),
       );
+
+    new Setting(containerEl)
+      .setName("Or custom voice ID")
+      .setDesc(
+        "Type any Kokoro voice ID (e.g. a new one not in the dropdown above). Leave empty to use the dropdown selection.",
+      )
+      .addText((t) => {
+        customInputEl = (t.inputEl as HTMLInputElement);
+        t.setPlaceholder("(use the dropdown)")
+          .setValue(isKnownVoice(this.plugin.settings.voice) ? "" : this.plugin.settings.voice)
+          .onChange(async (v) => {
+            const trimmed = v.trim();
+            if (trimmed) {
+              this.plugin.settings.voice = trimmed;
+              await this.plugin.saveSettings();
+            }
+          });
+      });
 
     new Setting(containerEl)
       .setName("Default speed")

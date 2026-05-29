@@ -331,6 +331,44 @@ code, pre {
   padding: 0.9rem 1rem 0.3rem;
 }
 
+/* ── Trailer band ────────────────────────────────────────────────────── */
+.trailer {
+  background: radial-gradient(ellipse 60% 100% at 50% 0%, rgba(214, 221, 226, 0.06), transparent 70%), var(--bg-base);
+  padding-top: clamp(2rem, 5vw, 4rem);
+  padding-bottom: clamp(2rem, 5vw, 4rem);
+}
+.trailer-inner {
+  padding-top: 0;
+  padding-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+.trailer .eyebrow {
+  margin-bottom: 0;
+}
+.trailer-frame {
+  margin: 0;
+  width: 100%;
+  max-width: 980px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-bright);
+  background: var(--bg-surface);
+  padding: 8px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 40px 80px -20px rgba(0, 0, 0, 0.6),
+    0 0 60px rgba(214, 221, 226, 0.06);
+}
+.trailer-frame video {
+  width: 100%;
+  height: auto;
+  border-radius: calc(var(--radius-lg) - 8px);
+  display: block;
+  background: var(--bg-deep);
+}
+
 /* ── Generic band ───────────────────────────────────────────────────── */
 .band-inner {
   max-width: var(--container);

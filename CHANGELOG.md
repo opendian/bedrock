@@ -4,6 +4,14 @@ All notable changes to Bedrock Voice are tracked here. Versioning follows [SemVe
 
 ## [Unreleased]
 
+### Added
+- **Voice selection dropdown** with 27 curated Kokoro voices grouped by language (American English, British English, French, Italian, Spanish, Japanese, Mandarin Chinese) and gender. The existing text input is now an "Or custom voice ID" override for power users and future voices not yet curated. Custom IDs already set in `data.json` are preserved and shown in the dropdown labeled `<id> (custom)`.
+- **Kokoro language auto-derivation** — the Kokoro `lang_code` is now inferred from the voice ID prefix (e.g. `ff_siwis` → `f`, `jf_alpha` → `j`, `zm_yunxi` → `z`). Previously it was hardcoded from the LLM language setting and only supported `a`/`f`. The LLM language setting still controls how the script is rewritten.
+- 31-second promo video on the landing page at `https://opendian.github.io/bedrock/#trailer`. Added as `og:video` for social embeds.
+
+### Changed
+- Landing OG image switched from `hero.gif` to a still poster frame from the promo (`promo-poster.jpg`) — cleaner thumbnail in Reddit/HN/Twitter previews.
+
 ## [0.1.1] — 2026-05-29
 
 This is the first reliable release. v0.1.0 shipped with a launch-critical regression in `extract_source` that caused the audio narration to drift from — or completely fabricate — content for any note with structural H2 headings. v0.1.1 fixes the extraction, pins macOS Apple Silicon as the supported platform, makes the fully-offline `local` LLM backend the honest default, and shrinks install to one command.
