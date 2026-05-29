@@ -57,6 +57,10 @@ jobs:
               split_frontmatter=lambda t: (None, t),
               slugify=lambda s, **k: re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-") or "x",
           )
+          # Stub numpy + soundfile so the module imports cleanly without runtime deps.
+          # extract_source itself uses neither; the imports live at module top.
+          sys.modules["numpy"] = types.ModuleType("numpy")
+          sys.modules["soundfile"] = types.ModuleType("soundfile")
           # Now we can import the real extract_source.
           import importlib.util
           spec = importlib.util.spec_from_file_location("nta", "note_to_audio.py")
