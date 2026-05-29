@@ -1,0 +1,75 @@
+name: Bug report
+description: Something is broken or behaves unexpectedly.
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: Describe the bug. Include the exact step that triggered it.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+      description: What should have happened instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open a note with frontmatter `tldr: ...`
+        2. Click "Read note aloud with captions"
+        3. ...
+    validations:
+      required: true
+
+  - type: input
+    id: obsidian
+    attributes:
+      label: Obsidian version
+      placeholder: "1.7.x"
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: OS
+      placeholder: "macOS 14.5 Apple Silicon"
+    validations:
+      required: true
+
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Bedrock Voice version
+      placeholder: "0.1.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: backend
+    attributes:
+      label: LLM backend
+      options:
+        - claude
+        - codex
+        - local
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Console / pipeline logs
+      description: |
+        Open Obsidian → Developer Tools → Console. Copy any red errors.
+        For pipeline errors, run `python note_to_audio.py <note> --captions` directly and paste stderr.
+      render: shell

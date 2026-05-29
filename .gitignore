@@ -1,0 +1,27 @@
+# Plugin build artefacts
+plugin/main.js
+plugin/main.js.map
+plugin/node_modules/
+plugin/.npm/
+plugin/*.log
+
+# Python pipeline runtime state
+voice/.venv/
+voice/__pycache__/
+voice/*.pyc
+voice/*.log
+voice/.env
+
+# Generated audio (regenerable, not part of source)
+voice/output/
+**/Sources/audio/
+
+# OS noise
+.DS_Store
+._*
+Thumbs.db
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp

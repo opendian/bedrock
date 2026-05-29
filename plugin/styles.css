@@ -1,0 +1,75 @@
+.bedrock-hud {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
+  z-index: var(--layer-modal, 100);
+  max-width: min(820px, 88vw);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px 22px;
+  border-radius: 16px;
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px);
+}
+
+.bedrock-stage {
+  text-align: center;
+}
+
+.bedrock-cur {
+  font-size: 1.5rem;
+  line-height: 1.45;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* word already spoken */
+.bedrock-cur .spoken {
+  color: var(--text-normal);
+}
+
+/* word being spoken now */
+.bedrock-cur .speaking {
+  color: var(--text-accent);
+  text-shadow: 0 0 12px var(--text-accent);
+}
+
+.bedrock-next {
+  margin-top: 6px;
+  font-size: 0.95rem;
+  color: var(--text-faint);
+  min-height: 1.2em;
+}
+
+.bedrock-ctl {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.bedrock-btn {
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 1rem;
+  background: var(--interactive-normal);
+  color: var(--text-normal);
+}
+
+.bedrock-btn:hover {
+  background: var(--interactive-hover);
+}
+
+.bedrock-speed {
+  border-radius: 8px;
+  padding: 4px 8px;
+  background: var(--interactive-normal);
+  color: var(--text-normal);
+  border: 1px solid var(--background-modifier-border);
+}

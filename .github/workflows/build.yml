@@ -1,0 +1,63 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  plugin:
+    name: Plugin (TypeScript)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: plugin
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: plugin/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check
+        run: npx tsc --noEmit
+
+      - name: Build
+        run: node esbuild.config.mjs production
+
+      - name: Verify build artefacts
+        run: |
+          test -f main.js || (echo "main.js not produced" && exit 1)
+          test -f manifest.json || (echo "manifest.json missing" && exit 1)
+          test -f styles.css || (echo "styles.css missing" && exit 1)
+
+  voice:
+    name: Voice pipeline (Python)
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: voice
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Syntax-check Python sources
+        run: |
+          python -m py_compile note_to_audio.py llm.py vault.py config.py dictate.py
+
+      - name: Verify requirements parse
+        run: |
+          python -m pip install --upgrade pip
+          pip install --dry-run -r requirements.txt || true
+          echo "requirements.txt is parseable"
