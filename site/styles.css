@@ -258,6 +258,36 @@ code, pre {
   font-size: 0.88rem;
   color: var(--text-muted);
 }
+.platform-note {
+  margin: 1.25rem auto 0;
+  max-width: 600px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 200, 120, 0.05);
+}
+.platform-note strong {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+.platform-banner {
+  margin: 1.5rem 0 2.5rem;
+  padding: 1rem 1.25rem;
+  border-left: 3px solid #ffce6e;
+  background: rgba(255, 206, 110, 0.06);
+  border-radius: 4px;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+.platform-banner strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+.cost-table tr.row-default {
+  background: rgba(214, 221, 226, 0.06);
+}
 .hero-meta span {
   display: inline-flex;
   align-items: center;

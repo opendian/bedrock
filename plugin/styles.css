@@ -1,18 +1,37 @@
+/* Bedrock Voice — plugin styles
+   Accessibility commitments (see docs/ACCESSIBILITY.md):
+   - WCAG AA contrast for caption text against the HUD background.
+   - prefers-reduced-motion: no animated glow, no transitions.
+   - Focus-visible outlines on every interactive element.
+   - forced-colors fallback for Windows High Contrast.
+   - Active word marked by 3 simultaneous channels (color, weight,
+     underline) so colour-blind + reduced-motion users still see it. */
+
 .bedrock-hud {
   position: fixed;
   left: 50%;
   bottom: 28px;
   transform: translateX(-50%);
   z-index: var(--layer-modal, 100);
-  max-width: min(820px, 88vw);
+  width: min(820px, 88vw);
   display: flex;
   flex-direction: column;
   gap: 10px;
   padding: 18px 22px;
   border-radius: 16px;
-  background: var(--background-secondary);
-  border: 1px solid var(--background-modifier-border);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+
+  /* Safe defaults; theme variables override when available. */
+  --bedrock-bg: var(--background-secondary, #1a1d22);
+  --bedrock-fg: var(--text-normal, #f5f3ef);
+  --bedrock-fg-muted: var(--text-muted, #b9bcc2);
+  --bedrock-fg-faint: var(--text-faint, #8a8d96);
+  --bedrock-accent: var(--text-accent, #ffd166);
+  --bedrock-border: var(--background-modifier-border, rgba(255, 255, 255, 0.12));
+
+  background: var(--bedrock-bg);
+  color: var(--bedrock-fg);
+  border: 1px solid var(--bedrock-border);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
   backdrop-filter: blur(8px);
 }
 
@@ -23,25 +42,30 @@
 .bedrock-cur {
   font-size: 1.5rem;
   line-height: 1.45;
-  font-weight: 600;
-  color: var(--text-muted);
+  font-weight: 500;
+  color: var(--bedrock-fg-muted);
+  overflow-wrap: anywhere;
 }
 
-/* word already spoken */
 .bedrock-cur .spoken {
-  color: var(--text-normal);
+  color: var(--bedrock-fg);
 }
 
-/* word being spoken now */
+/* Active word — three signal channels (color + weight + underline).
+   Glow is a fourth channel that disappears under prefers-reduced-motion. */
 .bedrock-cur .speaking {
-  color: var(--text-accent);
-  text-shadow: 0 0 12px var(--text-accent);
+  color: var(--bedrock-accent);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  text-shadow: 0 0 12px var(--bedrock-accent);
 }
 
 .bedrock-next {
   margin-top: 6px;
   font-size: 0.95rem;
-  color: var(--text-faint);
+  color: var(--bedrock-fg-faint);
   min-height: 1.2em;
 }
 
@@ -54,22 +78,116 @@
 
 .bedrock-btn {
   cursor: pointer;
-  border: none;
+  border: 1px solid var(--bedrock-border);
   border-radius: 8px;
-  padding: 6px 12px;
+  padding: 6px 14px;
   font-size: 1rem;
-  background: var(--interactive-normal);
-  color: var(--text-normal);
+  background: var(--interactive-normal, #2a2d33);
+  color: var(--bedrock-fg);
+  min-width: 44px;
+  min-height: 32px;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 .bedrock-btn:hover {
-  background: var(--interactive-hover);
+  background: var(--interactive-hover, #353941);
+  border-color: var(--bedrock-fg-faint);
+}
+
+.bedrock-btn:focus-visible {
+  outline: 2px solid var(--bedrock-accent);
+  outline-offset: 2px;
 }
 
 .bedrock-speed {
   border-radius: 8px;
-  padding: 4px 8px;
-  background: var(--interactive-normal);
-  color: var(--text-normal);
+  padding: 6px 10px;
+  background: var(--interactive-normal, #2a2d33);
+  color: var(--bedrock-fg);
+  border: 1px solid var(--bedrock-border);
+  cursor: pointer;
+  min-height: 32px;
+}
+
+.bedrock-speed:focus-visible {
+  outline: 2px solid var(--bedrock-accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bedrock-cur .speaking {
+    text-shadow: none;
+  }
+  .bedrock-btn,
+  .bedrock-speed {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .bedrock-hud {
+    background: Canvas;
+    color: CanvasText;
+    border: 1px solid CanvasText;
+  }
+  .bedrock-cur .spoken { color: CanvasText; }
+  .bedrock-cur .speaking {
+    color: Highlight;
+    text-shadow: none;
+  }
+  .bedrock-btn,
+  .bedrock-speed {
+    background: ButtonFace;
+    color: ButtonText;
+    border: 1px solid ButtonText;
+  }
+}
+
+/* ── Install modal ─────────────────────────────────────────────────── */
+.bedrock-modal-context {
+  background-color: rgba(255, 200, 120, 0.08);
+  border-left: 3px solid var(--text-warning, #ffb648);
+  padding: 0.65em 0.9em;
+  margin: 0 0 1em;
+  font-size: 0.92em;
+  border-radius: 4px;
+}
+
+.bedrock-modal-cmd {
+  margin: 0.5em 0 1em;
+  padding: 0.9em 1em;
+  background: var(--code-background, #0e1014);
   border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  font-family: var(--font-monospace);
+  font-size: 0.92em;
+  overflow-x: auto;
+  user-select: all;
+}
+
+.bedrock-modal-cmd code {
+  background: transparent;
+  padding: 0;
+  color: var(--text-normal);
+  white-space: pre-wrap;
+}
+
+.bedrock-modal-actions {
+  display: flex;
+  gap: 0.6em;
+  margin: 0 0 1em;
+  flex-wrap: wrap;
+}
+
+.bedrock-modal-actions button:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 2px;
+}
+
+.bedrock-modal-foot {
+  margin-top: 1.5em;
+  padding-top: 1em;
+  border-top: 1px solid var(--background-modifier-border);
+  color: var(--text-muted);
+  font-size: 0.88em;
 }

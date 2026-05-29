@@ -104,40 +104,59 @@ These aren't features tacked on — they're the spine of the project. Full notes
 
 ---
 
+## Platform support — v0.1
+
+> [!important]
+> **v0.1 is macOS Apple Silicon only.** Windows, Linux, and Intel Macs are not supported yet.
+
+| Platform | Status |
+| --- | --- |
+| **macOS Apple Silicon** | ✅ Supported — tested daily |
+| macOS Intel | ⚠ Kokoro TTS works, but the default `local` LLM backend (MLX) does not. Switch backend to `claude`/`codex` if you have those CLIs. |
+| Linux | 🚧 Not yet. PRs welcome. |
+| Windows | 🚧 Not yet — install path needs rewriting (no bash, no brew). |
+| iOS / Android | ❌ Obsidian mobile can't shell out to Python. |
+
+If you're not on Apple Silicon, stop here. The install will fail or the plugin will degrade silently — neither is fun.
+
+---
+
 ## Install
 
-> **Requirements:** macOS (Apple Silicon strongly preferred). Obsidian desktop. Windows + Linux are on the roadmap.
+Two steps. Five minutes if Homebrew is already on your machine.
 
-### 1. Install the plugin
+### 1. Plugin via BRAT
 
-Until it's on the community plugin list, use [BRAT](https://github.com/TfTHacker/obsidian42-brat):
+1. Install [BRAT](https://github.com/TfTHacker/obsidian42-brat) from Obsidian community plugins.
+2. BRAT → "Add Beta Plugin" → paste:
+   ```
+   opendian/bedrock
+   ```
+3. Enable **Bedrock Voice** under Settings → Community plugins.
 
-1. Install BRAT from Obsidian community plugins.
-2. BRAT settings → "Add Beta Plugin" → paste `opendian/bedrock`.
-3. Enable **Bedrock Voice** under Community plugins.
-
-Or manually — download `main.js`, `manifest.json`, `styles.css` from [Releases](https://github.com/opendian/bedrock/releases/latest) and drop them into `<your-vault>/.obsidian/plugins/bedrock-voice/`.
-
-### 2. Install the voice pipeline
-
-A small Python pipeline ships inside the plugin folder under `voice/`. One-time setup:
+### 2. One command for the pipeline
 
 ```bash
-brew install python@3.12 espeak-ng ffmpeg
-cd "<your-vault>/.obsidian/plugins/bedrock-voice/voice"
-bash install.sh
+cd "<your-vault>/.obsidian/plugins/bedrock-voice/voice" && bash install.sh
 ```
 
-The first run downloads the Kokoro 82M voice (~300MB), once.
+The installer:
 
-### 3. Pick a backend (optional)
+- Verifies macOS Apple Silicon (fails fast with a clear message otherwise).
+- Installs Homebrew if missing (asks first).
+- Installs Python 3.12, espeak-ng, ffmpeg.
+- Creates a `.venv` and installs Kokoro + MLX-LM.
+- Smoke-tests the pipeline.
 
-By default Bedrock Voice uses the `claude` CLI to tighten the spoken script. If you don't have Claude Code installed, switch in Settings → Bedrock Voice → LLM backend:
+First run: 3–6 minutes. First read: another ~30s while Kokoro and MLX warm up.
 
-- **`codex`** — Uses the OpenAI Codex CLI (same auth model).
-- **`local`** — Fully offline. MLX-LM with a small model. `pip install mlx-lm` inside the voice venv.
+### Backend (the honest part)
 
-All three avoid metered API calls — see [Why this stays on your machine](#why-this-stays-on-your-machine).
+The default backend is **`local`** — MLX-LM running fully offline on your machine. No API key, no subscription, no `OPENAI_API_KEY`, no `ANTHROPIC_API_KEY`. Script tightening takes 8–20 seconds per read on `local`. 
+
+If you already have **Claude Code** or the **OpenAI Codex CLI** installed (subscription auth, $0 marginal), switch in Settings → Bedrock Voice → LLM backend → `claude` or `codex`. Script tightening drops to 1–4 seconds.
+
+We default to `local` so the "no metered API" claim is true for everyone, not just CLI power users.
 
 ---
 
@@ -183,11 +202,11 @@ Bedrock Voice was built for a personal vault where every read shouldn't tick a m
 | Component | Where it runs | What it costs |
 | --- | --- | --- |
 | TTS (Kokoro 82M) | Locally, on your CPU | $0 |
-| Script tightening (`claude`) | Via Claude Code CLI auth (subscription) | $0 marginal |
-| Script tightening (`codex`) | Via OpenAI Codex CLI auth (subscription) | $0 marginal |
-| Script tightening (`local`) | MLX-LM in-process | $0 (offline) |
+| **Default backend** — script tightening (`local`) | MLX-LM in-process | **$0 (fully offline)** |
+| Optional — script tightening (`claude`) | Claude Code CLI auth (subscription) | $0 marginal if you already pay |
+| Optional — script tightening (`codex`) | OpenAI Codex CLI auth (subscription) | $0 marginal if you already pay |
 
-No `ANTHROPIC_API_KEY`. No `OPENAI_API_KEY`. No `ELEVENLABS_API_KEY`. Nothing ticks.
+The honest version: the **default path is $0 with no external auth required**. The CLI backends are faster but only free if you already have those subscriptions — we made `local` the default so the no-meter promise holds even if you don't.
 
 ---
 

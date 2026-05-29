@@ -57,10 +57,11 @@
 
         <div class="hero-meta">
           <span><span class="dot dot-mit"></span>MIT licensed</span>
-          <span><span class="dot dot-local"></span>Local TTS</span>
+          <span><span class="dot dot-local"></span>Fully offline by default</span>
           <span><span class="dot dot-no-api"></span>No API key</span>
-          <span><span class="dot dot-mac"></span>Apple Silicon native</span>
+          <span><span class="dot dot-mac"></span>macOS Apple Silicon · v0.1</span>
         </div>
+        <p class="platform-note">v0.1 is <strong>macOS Apple Silicon only</strong>. Windows, Linux, and Intel Macs are on the roadmap — not yet supported.</p>
       </div>
 
       <figure class="hero-demo reveal">
@@ -196,25 +197,25 @@
               <td>Locally, on your CPU</td>
               <td class="zero">$0</td>
             </tr>
-            <tr>
-              <td>Script tightening (<code>claude</code>)</td>
-              <td>Claude Code CLI auth</td>
-              <td class="zero">$0 marginal</td>
-            </tr>
-            <tr>
-              <td>Script tightening (<code>codex</code>)</td>
-              <td>OpenAI Codex CLI auth</td>
-              <td class="zero">$0 marginal</td>
-            </tr>
-            <tr>
-              <td>Script tightening (<code>local</code>)</td>
+            <tr class="row-default">
+              <td><strong>Default backend</strong> — script tightening (<code>local</code>)</td>
               <td>MLX-LM in-process</td>
-              <td class="zero">$0 (offline)</td>
+              <td class="zero">$0 — fully offline</td>
+            </tr>
+            <tr>
+              <td>Optional — script tightening (<code>claude</code>)</td>
+              <td>Claude Code CLI auth</td>
+              <td class="zero">$0 marginal · if you already pay</td>
+            </tr>
+            <tr>
+              <td>Optional — script tightening (<code>codex</code>)</td>
+              <td>OpenAI Codex CLI auth</td>
+              <td class="zero">$0 marginal · if you already pay</td>
             </tr>
           </tbody>
         </table>
 
-        <p class="lead">No <code>ANTHROPIC_API_KEY</code>. No <code>OPENAI_API_KEY</code>. No <code>ELEVENLABS_API_KEY</code>. Nothing ticks.</p>
+        <p class="lead">The honest version: <strong>the default path is $0 with no external auth required</strong>. The CLI backends are faster but only free if you already have those subscriptions — we made <code>local</code> the default so the no-meter promise holds for everyone.</p>
       </div>
     </section>
 
@@ -223,24 +224,27 @@
         <p class="eyebrow">Install</p>
         <h2>Three steps, ten minutes.</h2>
 
+        <div class="platform-banner" role="note">
+          <strong>v0.1 requirement:</strong> macOS Apple Silicon. The installer fails fast with a clear message on other platforms. Windows, Linux, and Intel Macs are on the roadmap.
+        </div>
+
         <ol class="install-steps">
           <li>
-            <h3>1. Install the plugin via BRAT</h3>
-            <p>Install <a href="https://github.com/TfTHacker/obsidian42-brat" rel="noopener">BRAT</a> from Obsidian community plugins, then BRAT settings → "Add Beta Plugin" → paste:</p>
+            <h3>1. Plugin via BRAT</h3>
+            <p>Install <a href="https://github.com/TfTHacker/obsidian42-brat" rel="noopener">BRAT</a> from Obsidian community plugins, then BRAT → "Add Beta Plugin" → paste:</p>
             <pre><code>opendian/bedrock</code></pre>
             <p>Enable <strong>Bedrock Voice</strong> under Community plugins.</p>
           </li>
           <li>
-            <h3>2. Install the voice pipeline</h3>
-            <p>A small Python pipeline ships inside the plugin folder under <code>voice/</code>. One-time setup:</p>
-            <pre><code>brew install python@3.12 espeak-ng ffmpeg
-cd "&lt;your-vault&gt;/.obsidian/plugins/bedrock-voice/voice"
-bash install.sh</code></pre>
-            <p>First run downloads Kokoro 82M (~300 MB), once.</p>
+            <h3>2. One command for the pipeline</h3>
+            <p>Open Terminal and run:</p>
+            <pre><code>cd "&lt;your-vault&gt;/.obsidian/plugins/bedrock-voice/voice" &amp;&amp; bash install.sh</code></pre>
+            <p>The installer verifies platform, installs Homebrew (if missing) + Python 3.12 + Kokoro + MLX-LM, smoke-tests the pipeline. 3–6 min on a fresh machine. The plugin's "Show pipeline install instructions" command also gives you this exact command with a copy button.</p>
           </li>
           <li>
             <h3>3. Read a note aloud</h3>
             <p>Open any note. Ribbon icon (<code>audio-lines</code>) or command palette → <strong>Read note aloud with captions</strong>. Space toggles play/pause. Escape closes the HUD.</p>
+            <p>First read warms up the model (~30 s). Subsequent reads of unchanged notes replay from cache instantly.</p>
           </li>
         </ol>
 

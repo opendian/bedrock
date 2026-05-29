@@ -2,6 +2,7 @@ import {
   App,
   FileSystemAdapter,
   MarkdownView,
+  Modal,
   Notice,
   Plugin,
   PluginSettingTab,
@@ -33,7 +34,10 @@ interface BedrockVoiceSettings {
 }
 
 const DEFAULTS: BedrockVoiceSettings = {
-  backend: "claude",
+  // `local` (MLX-LM) is the honest default: fully offline, no API key, no
+  // subscription needed. Slower than `claude` or `codex` but it's the only
+  // backend that's truly $0 with no external dependency. Apple Silicon only.
+  backend: "local",
   lang: "en",
   voice: "af_heart",
   rate: 1.0,
@@ -58,6 +62,11 @@ export default class BedrockVoice extends Plugin {
       id: "stop-reading",
       name: "Stop reading",
       callback: () => this.stop(),
+    });
+    this.addCommand({
+      id: "open-install-instructions",
+      name: "Show pipeline install instructions",
+      callback: () => this.showInstallInstructions(),
     });
     this.addSettingTab(new BedrockVoiceSettingTab(this.app, this));
   }
@@ -108,17 +117,11 @@ export default class BedrockVoice extends Plugin {
     const py = path.join(voiceDir, ".venv", "bin", "python");
     const script = path.join(voiceDir, "note_to_audio.py");
     if (!fs.existsSync(script)) {
-      new Notice(
-        `Bedrock Voice: pipeline missing at ${voiceDir}. Run install.sh from the README first.`,
-        10000,
-      );
+      this.showInstallInstructions(`Pipeline missing at ${voiceDir}.`);
       return;
     }
     if (!fs.existsSync(py)) {
-      new Notice(
-        "Bedrock Voice: Python venv missing. Run `bash install.sh` inside the voice/ folder.",
-        10000,
-      );
+      this.showInstallInstructions("Python venv missing — the install step hasn't been run yet.");
       return;
     }
 
@@ -141,9 +144,22 @@ export default class BedrockVoice extends Plugin {
     }
   }
 
+  /** Open a modal explaining the one-time install step, with a copyable command. */
+  private showInstallInstructions(extra?: string) {
+    let voiceDir = "<plugin-folder>/voice";
+    try {
+      voiceDir = this.resolveVoiceDir();
+    } catch {
+      /* keep placeholder */
+    }
+    const command = `cd "${voiceDir}" && bash install.sh`;
+    new InstallModal(this.app, command, extra).open();
+  }
+
   private run(py: string, args: string[], cwd: string): Promise<CaptionPayload> {
     const env = {
       ...process.env,
+      BEDROCK_VAULT_ROOT: this.vaultBase(),
       BEDROCK_LLM_BACKEND: this.settings.backend,
       BEDROCK_KOKORO_VOICE: this.settings.voice,
       BEDROCK_KOKORO_LANG: this.settings.lang === "fr" ? "f" : "a",
@@ -185,7 +201,9 @@ class CaptionHud {
   private curEl: HTMLElement;
   private nextEl: HTMLElement;
   private playBtn: HTMLButtonElement;
+  private stopBtn: HTMLButtonElement;
   private raf = 0;
+  private lastAnnouncedIdx = -1;
 
   constructor(
     private payload: CaptionPayload,
@@ -194,29 +212,47 @@ class CaptionHud {
     private onClose: () => void,
   ) {
     this.el = document.body.createDiv({ cls: "bedrock-hud" });
+    this.el.setAttribute("role", "region");
+    this.el.setAttribute("aria-label", "Bedrock Voice — read note aloud");
+
     const stage = this.el.createDiv({ cls: "bedrock-stage" });
     this.curEl = stage.createDiv({ cls: "bedrock-cur" });
+    this.curEl.setAttribute("aria-live", "polite");
+    this.curEl.setAttribute("aria-atomic", "true");
+    this.curEl.setAttribute("aria-label", "Current sentence");
     this.nextEl = stage.createDiv({ cls: "bedrock-next" });
+    this.nextEl.setAttribute("aria-hidden", "true");
 
     const ctl = this.el.createDiv({ cls: "bedrock-ctl" });
     this.playBtn = ctl.createEl("button", { text: "⏸", cls: "bedrock-btn" });
+    this.playBtn.setAttribute("aria-label", "Pause reading");
+    this.playBtn.setAttribute("title", "Pause (Space)");
+
     const speed = ctl.createEl("select", { cls: "bedrock-speed" });
+    speed.setAttribute("aria-label", "Playback speed");
     [0.75, 1, 1.25, 1.5, 1.75].forEach((v) => {
       const o = speed.createEl("option", { text: `${v}×`, value: String(v) });
       if (v === rate) o.selected = true;
     });
-    const stopBtn = ctl.createEl("button", { text: "✕", cls: "bedrock-btn" });
+
+    this.stopBtn = ctl.createEl("button", { text: "✕", cls: "bedrock-btn" });
+    this.stopBtn.setAttribute("aria-label", "Close reader");
+    this.stopBtn.setAttribute("title", "Close (Escape)");
 
     this.audio = new Audio(src);
     this.audio.playbackRate = rate;
 
     this.playBtn.onclick = () => this.toggle();
-    stopBtn.onclick = () => this.destroy();
+    this.stopBtn.onclick = () => this.destroy();
     speed.onchange = () => (this.audio.playbackRate = parseFloat(speed.value));
     this.audio.onended = () => this.destroy();
 
     this.keyHandler = this.keyHandler.bind(this);
     document.addEventListener("keydown", this.keyHandler);
+
+    // Move focus into the HUD so keyboard users land here. Stop button is
+    // explicit "exit" and a safe default focus target.
+    this.stopBtn.focus({ preventScroll: true });
 
     void this.audio.play();
     this.loop();
@@ -234,10 +270,12 @@ class CaptionHud {
     if (this.audio.paused) {
       void this.audio.play();
       this.playBtn.setText("⏸");
+      this.playBtn.setAttribute("aria-label", "Pause reading");
       this.loop();
     } else {
       this.audio.pause();
       this.playBtn.setText("▶");
+      this.playBtn.setAttribute("aria-label", "Resume reading");
     }
   }
 
@@ -270,6 +308,13 @@ class CaptionHud {
       acc += token.length;
     }
     this.nextEl.setText(segs[i + 1]?.text ?? "");
+
+    // Screen-reader announce only when the sentence advances (avoid spamming on
+    // every animation frame). aria-live="polite" on .bedrock-cur picks this up.
+    if (i !== this.lastAnnouncedIdx) {
+      this.lastAnnouncedIdx = i;
+      this.curEl.setAttribute("data-sentence-index", String(i));
+    }
   }
 
   destroy() {
@@ -279,6 +324,70 @@ class CaptionHud {
     this.audio.removeAttribute("src");
     this.el.remove();
     this.onClose();
+  }
+}
+
+/** First-run install modal — copyable terminal command. */
+class InstallModal extends Modal {
+  constructor(app: App, private command: string, private context?: string) {
+    super(app);
+  }
+
+  onOpen() {
+    const { contentEl, titleEl } = this;
+    titleEl.setText("Bedrock Voice — one-time setup");
+
+    if (this.context) {
+      contentEl.createEl("p", { text: this.context, cls: "bedrock-modal-context" });
+    }
+
+    contentEl.createEl("p", {
+      text: "Bedrock Voice needs a small Python pipeline (Kokoro TTS + a local LLM) to read your notes aloud. Run this once in your terminal:",
+    });
+
+    const cmdBox = contentEl.createDiv({ cls: "bedrock-modal-cmd" });
+    const code = cmdBox.createEl("code", { text: this.command });
+    code.setAttribute("aria-label", "Install command");
+
+    const btnRow = contentEl.createDiv({ cls: "bedrock-modal-actions" });
+    const copyBtn = btnRow.createEl("button", { text: "Copy command", cls: "mod-cta" });
+    copyBtn.setAttribute("aria-label", "Copy install command to clipboard");
+    copyBtn.onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(this.command);
+        copyBtn.setText("Copied ✓");
+        setTimeout(() => copyBtn.setText("Copy command"), 1800);
+      } catch {
+        new Notice("Bedrock Voice: copy failed — select the command and copy manually.", 6000);
+      }
+    };
+
+    const docsBtn = btnRow.createEl("button", { text: "Open install docs" });
+    docsBtn.onclick = () => {
+      window.open("https://opendian.github.io/bedrock/#install", "_blank");
+    };
+
+    contentEl.createEl("h3", { text: "What it does" });
+    const ul = contentEl.createEl("ul");
+    [
+      "Verifies macOS Apple Silicon (v0.1 is Apple-Silicon only).",
+      "Installs Python 3.12 + audio deps via Homebrew.",
+      "Creates a .venv and installs Kokoro + MLX-LM.",
+      "Pre-downloads the Kokoro 82M voice (~300 MB, one time).",
+      "Reports any failure with the exact next step.",
+    ].forEach((t) => ul.createEl("li", { text: t }));
+
+    contentEl.createEl("p", {
+      cls: "bedrock-modal-foot",
+      text: "Default backend is fully offline (MLX-LM). No API key, no metered service. If install fails, see the troubleshooting doc on GitHub.",
+    });
+
+    // Move focus to the primary action for keyboard users
+    copyBtn.focus({ preventScroll: true });
+  }
+
+  onClose() {
+    this.contentEl.empty();
   }
 }
 
