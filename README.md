@@ -18,6 +18,10 @@
   <a href="https://github.com/opendian"><img alt="Opendian" src="https://img.shields.io/badge/by-opendian-181717.svg" /></a>
 </p>
 
+<p align="center">
+  <a href="https://opendian.github.io/bedrock/"><strong>opendian.github.io/bedrock</strong></a> — the landing page
+</p>
+
 <p align="center">Bedrock Voice reads your Obsidian notes aloud — with karaoke captions that highlight each word as it's spoken. Runs locally on your Mac. No notes leave your machine.</p>
 
 <p align="center">
