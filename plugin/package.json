@@ -23,11 +23,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yanimeziani/bedrock-voice.git"
+    "url": "https://github.com/opendian/bedrock.git"
   },
-  "homepage": "https://github.com/yanimeziani/bedrock-voice#readme",
+  "homepage": "https://github.com/opendian/bedrock#readme",
   "bugs": {
-    "url": "https://github.com/yanimeziani/bedrock-voice/issues"
+    "url": "https://github.com/opendian/bedrock/issues"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",

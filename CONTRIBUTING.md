@@ -91,4 +91,4 @@ For new community-plugin submissions, see `.github/COMMUNITY_PLUGIN_SUBMISSION.m
 
 ## Code of conduct
 
-Be useful. Be specific. Read [VOICE.md](https://github.com/yanimeziani/bedrock-voice/blob/main/docs/voice.md) (the writing style this project is built around) before opening philosophical PRs.
+Be useful. Be specific. Read [VOICE.md](https://github.com/opendian/bedrock/blob/main/docs/voice.md) (the writing style this project is built around) before opening philosophical PRs.

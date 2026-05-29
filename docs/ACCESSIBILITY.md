@@ -78,7 +78,7 @@ Kokoro runs on any OS, but the Apple Silicon path is what we've tested. Windows 
 - **Pronunciation overrides** — fix words Kokoro mangles (names, acronyms, technical terms) without rewriting the source note.
 - **Background TTS for whole folders** — queue a folder of notes for sequential reading, podcast-style.
 
-If you have lived-experience input on what would help you specifically, please [open an issue](https://github.com/yanimeziani/bedrock-voice/issues). The roadmap above is a guess; your feedback corrects it.
+If you have lived-experience input on what would help you specifically, please [open an issue](https://github.com/opendian/bedrock/issues). The roadmap above is a guess; your feedback corrects it.
 
 ---
 

@@ -1,14 +1,24 @@
-# Bedrock Voice
+<p align="center">
+  <img src="docs/logo.png" alt="Bedrock logo — a granite cube with a voice waveform carved into its seam" width="180" />
+</p>
 
-> **An accessibility-first reading companion for your second brain.**
->
-> Bedrock Voice reads your Obsidian notes aloud — with karaoke captions that highlight each word as it's spoken. Built for ADHD, dyslexia, auditory processing, and anyone trying to actually *finish* what they wrote down. Runs locally on your Mac. No metered API. No notes leave your machine.
+<h1 align="center">Bedrock Voice</h1>
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Accessibility](https://img.shields.io/badge/accessibility-first-success.svg)](docs/ACCESSIBILITY.md)
-[![Built with Kokoro](https://img.shields.io/badge/TTS-Kokoro%2082M-purple.svg)](https://huggingface.co/hexgrad/Kokoro-82M)
-[![Apple Silicon](https://img.shields.io/badge/Apple%20Silicon-native-black.svg)](#)
-[![No API Key](https://img.shields.io/badge/API%20key-none-green.svg)](#why-this-stays-on-your-machine)
+<p align="center">
+  <i>An accessibility-first reading companion for your second brain.</i><br/>
+  <sub>Karaoke captions. Local TTS. No metered API. Built for ADHD, dyslexia, and information overload.</sub>
+</p>
+
+<p align="center">
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg" /></a>
+  <a href="docs/ACCESSIBILITY.md"><img alt="Accessibility" src="https://img.shields.io/badge/accessibility-first-success.svg" /></a>
+  <a href="https://huggingface.co/hexgrad/Kokoro-82M"><img alt="Built with Kokoro" src="https://img.shields.io/badge/TTS-Kokoro%2082M-purple.svg" /></a>
+  <img alt="Apple Silicon" src="https://img.shields.io/badge/Apple%20Silicon-native-black.svg" />
+  <a href="#why-this-stays-on-your-machine"><img alt="No API Key" src="https://img.shields.io/badge/API%20key-none-green.svg" /></a>
+  <a href="https://github.com/opendian"><img alt="Opendian" src="https://img.shields.io/badge/by-opendian-181717.svg" /></a>
+</p>
+
+<p align="center">Bedrock Voice reads your Obsidian notes aloud — with karaoke captions that highlight each word as it's spoken. Runs locally on your Mac. No notes leave your machine.</p>
 
 <p align="center">
   <a href="docs/screenshots/hero.mp4">
@@ -99,10 +109,10 @@ These aren't features tacked on — they're the spine of the project. Full notes
 Until it's on the community plugin list, use [BRAT](https://github.com/TfTHacker/obsidian42-brat):
 
 1. Install BRAT from Obsidian community plugins.
-2. BRAT settings → "Add Beta Plugin" → paste `yanimeziani/bedrock-voice`.
+2. BRAT settings → "Add Beta Plugin" → paste `opendian/bedrock`.
 3. Enable **Bedrock Voice** under Community plugins.
 
-Or manually — download `main.js`, `manifest.json`, `styles.css` from [Releases](https://github.com/yanimeziani/bedrock-voice/releases/latest) and drop them into `<your-vault>/.obsidian/plugins/bedrock-voice/`.
+Or manually — download `main.js`, `manifest.json`, `styles.css` from [Releases](https://github.com/opendian/bedrock/releases/latest) and drop them into `<your-vault>/.obsidian/plugins/bedrock-voice/`.
 
 ### 2. Install the voice pipeline
 
